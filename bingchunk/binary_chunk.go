@@ -1,5 +1,25 @@
 package binchunk
 
+type LocVar struct {
+	VarName string
+	StartPC uint32
+	EndPC   uint32
+}
+
+type Upvalue struct {
+	Instack byte
+	Idx     byte
+}
+
+const (
+	TAG_NIL       = 0x00
+	TAG_BOOLEAN   = 0x01
+	TAG_NUMBER    = 0x03
+	TAG_INTEGER   = 0x13
+	TAG_SHORT_STR = 0x04
+	TAG_LONG_STR  = 0x14
+)
+
 type Prototype struct {
 	Source          string
 	LineDefined     uint32
@@ -46,4 +66,11 @@ type binaryChunk struct {
 	header
 	sizeUpvalues byte
 	mainFunc     *Prototype
+}
+
+func Undump(data []byte) *Prototype {
+	reader := &reader{data}
+	reader.checkHeader()
+	reader.readByte()
+	return reader.readProto("")
 }
