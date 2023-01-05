@@ -56,5 +56,6 @@ func (self *reader) readBytes(n uint) []byte {
 func (self *reader) checkHeader() {
 	if string(self.readBytes((4))) != LUA_SIGNATURE {
 		panic("not a precompiled chunk")
+	} else if self.readByte() != LUAC_VERSION {
 	}
 }
