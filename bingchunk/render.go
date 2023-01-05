@@ -57,5 +57,74 @@ func (self *reader) checkHeader() {
 	if string(self.readBytes((4))) != LUA_SIGNATURE {
 		panic("not a precompiled chunk")
 	} else if self.readByte() != LUAC_VERSION {
+		panic("version mismatch!")
+	} else if string(self.readBytes(6)) != LUAC_DATA {
+		panic("corrupted!")
+	} else if self.readByte() != CINT_SIZE {
+		panic("int size mismatch!")
+	} else if self.readByte() != CSZITE_SIZE {
+		panic("size_t size mismatch!")
+	} else if self.readByte() != INSTRUCTION_SIZE {
+		panic("instruction size mismatch!")
+	} else if self.readByte() != LUA_INTEGER_SIZE {
+		panic("lua_Integer size mismatch!")
+	} else if self.readLuaNumber() != LUAC_NUM {
+		panic("float format mismatch!")
+	}
+}
+
+// 都组指令表
+func (self *reader) readCode() []uint32 {
+	code := make([]uint32, self.readUnit32())
+	for i := range code {
+		code[i] = self.readUnit32()
+	}
+	return code
+}
+
+// 从字节流里读取常量表
+func (self *reader) readConstants() []interface{} {
+	constans := make([]interface{}, self.readUnit32())
+
+	for i := range constans {
+		constans[i] = self.readConstant()
+	}
+	return constans
+}
+
+func (self *reader) readConstant() interface{} {
+	switch self.readByte() {
+	case TAG_NIL:
+		return nil
+	case TAG_BOOLEAN:
+		return self.readByte() != 0
+	case TAG_INTEGER:
+		return self.readLuaInteger()
+	case TAG_NUMBER:
+		return self.readLuaNumber()
+	case TAG_SHORT_STR:
+		return self.readString()
+	case TAG_LONG_STR:
+		return self.readString()
+
+	default:
+		panic("corrupted!")
+	}
+}
+
+func (self *reader) readProto(parentSource string) *Prototype {
+	source := self.readString()
+	if source == "" {
+		source = parentSource
+	}
+
+	return &Prototype{
+		Source:          source,
+		LineDefined:     self.readUnit32(),
+		LastLineDefined: self.readUnit32(),
+		NumParams:       self.readByte(),
+		IsVararg:        self.readByte(),
+		MaxStackSize:    self.readByte(),
+		Code:            self.readCode(),
 	}
 }

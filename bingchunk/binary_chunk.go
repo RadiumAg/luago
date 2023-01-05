@@ -24,7 +24,7 @@ type Prototype struct {
 	Source          string
 	LineDefined     uint32
 	LastLineDefined uint32
-	NumParams       uint32
+	NumParams       byte
 	IsVararg        byte
 	MaxStackSize    byte
 	Code            []uint32
@@ -32,7 +32,7 @@ type Prototype struct {
 	Upvalues        []Upvalue
 	Protos          []*Prototype
 	LineInfo        []uint32
-	LocVars         []LocVars
+	LocVars         []LocVar
 	UpValueNames    []string
 }
 
@@ -43,7 +43,9 @@ const (
 	LUAC_DATA        = "\x19\x93\r\n\x1a\n"
 	CINT_SIZE        = 4
 	CSZITE_SIZE      = 8
+	INSTRUCTION_SIZE = 4
 	LUA_INTEGER_SIZE = 8
+	LUA_NUMBER_SIZE  = 8
 	LUAC_INT         = 0x5678
 	LUAC_NUM         = 370.5
 )
