@@ -89,7 +89,7 @@ func (self *reader) checkHeader() {
 	}
 }
 
-// 都组指令表
+// 读组指令表
 func (self *reader) readCode() []uint32 {
 	code := make([]uint32, self.readUnit32())
 	for i := range code {

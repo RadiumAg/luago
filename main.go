@@ -19,7 +19,13 @@ func main() {
 }
 
 func list(f *binchunk.Prototype) {
+	printHeader(f)
+	printCode(f)
+	printDetail(f)
 
+	for _, p := range f.Protos {
+		list(p)
+	}
 }
 
 func printHeader(f *binchunk.Prototype) {
