@@ -15,6 +15,12 @@ func (self *reader) readByte() byte {
 	return b
 }
 
+func (self *reader) readBytes(n uint) []byte {
+	bytes := self.data[:n]
+	self.data = self.data[n:]
+	return bytes
+}
+
 func (self *reader) readUnit32() uint32 {
 	i := binary.LittleEndian.Uint32(self.data)
 	self.data = self.data[4:]
@@ -28,7 +34,7 @@ func (self *reader) readUint64() uint64 {
 }
 
 func (self *reader) readLuaInteger() int64 {
-	return int64(self.readByte())
+	return int64(self.readUint64())
 }
 
 func (self *reader) readLuaNumber() float64 {
@@ -47,28 +53,38 @@ func (self *reader) readString() string {
 	return string(bytes)
 }
 
-func (self *reader) readBytes(n uint) []byte {
-	bytes := self.data[:n]
-	self.data = self.data[n:]
-	return bytes
-}
-
 func (self *reader) checkHeader() {
-	if string(self.readBytes((4))) != LUA_SIGNATURE {
-		panic("not a precompiled chunk")
-	} else if self.readByte() != LUAC_VERSION {
+	if string(self.readBytes(4)) != LUA_SIGNATURE {
+		panic("not a precompiled chunk!")
+	}
+	if self.readByte() != LUAC_VERSION {
 		panic("version mismatch!")
-	} else if string(self.readBytes(6)) != LUAC_DATA {
+	}
+	if self.readByte() != LUAC_FORMAT {
+		panic("format mismatch!")
+	}
+	if string(self.readBytes(6)) != LUAC_DATA {
 		panic("corrupted!")
-	} else if self.readByte() != CINT_SIZE {
+	}
+	if self.readByte() != CINT_SIZE {
 		panic("int size mismatch!")
-	} else if self.readByte() != CSZITE_SIZE {
+	}
+	if self.readByte() != CSIZET_SIZE {
 		panic("size_t size mismatch!")
-	} else if self.readByte() != INSTRUCTION_SIZE {
+	}
+	if self.readByte() != INSTRUCTION_SIZE {
 		panic("instruction size mismatch!")
-	} else if self.readByte() != LUA_INTEGER_SIZE {
+	}
+	if self.readByte() != LUA_INTEGER_SIZE {
 		panic("lua_Integer size mismatch!")
-	} else if self.readLuaNumber() != LUAC_NUM {
+	}
+	if self.readByte() != LUA_NUMBER_SIZE {
+		panic("lua_Number size mismatch!")
+	}
+	if self.readLuaInteger() != LUAC_INT {
+		panic("endianness mismatch!")
+	}
+	if self.readLuaNumber() != LUAC_NUM {
 		panic("float format mismatch!")
 	}
 }
