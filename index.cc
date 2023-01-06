@@ -1,15 +1,15 @@
-int main(int argc, const char** argv) {
-    struct a {
-        int c;
-        int b;
-    };
-    a c = {
-        c:1,
-        b:2
-    };
+#include <stdio.h>
 
-    int g = 1;
-    int *k = &g;
-     *k = 1;
-     a *d = &c;
+void max(int *num1)
+{
+    printf(" %p ", num1);
+    *num1 = 2;
 }
+
+int main(int argc, const char **argv)
+{
+    int a = 1;
+    max(&a);
+    printf(" %d ", a);
+}
+

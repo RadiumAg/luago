@@ -28,7 +28,7 @@ func (self Instruction) ABx() (a, bx int) {
 }
 
 // 从iAsBx模式指令中读取参数
-func (self Instruction) AsBx(a, sbx int) {
+func (self Instruction) AsBx() (a, sbx int) {
 	a, bx := self.ABx()
 	return a, bx - MAXARG_sBx
 }
@@ -39,4 +39,12 @@ func (self Instruction) Ax() int {
 
 func (self Instruction) OpName() string {
 	return opcodes[self.Opcode()].name
+}
+
+func (self Instruction) BMode() byte {
+	return opcodes[self.Opcode()].argBMode
+}
+
+func (self Instruction) CMode() byte {
+	return opcodes[self.Opcode()].argCMode
 }
