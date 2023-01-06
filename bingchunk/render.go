@@ -112,6 +112,53 @@ func (self *reader) readConstant() interface{} {
 	}
 }
 
+func (self *reader) readUpvalues() []Upvalue {
+	upvalues := make([]Upvalue, self.readUnit32())
+	for i := range upvalues {
+		upvalues[i] = Upvalue{
+			Instack: self.readByte(),
+			Idx:     self.readByte(),
+		}
+	}
+	return upvalues
+}
+
+func (self *reader) readProtos(parentSource string) []*Prototype {
+	protos := make([]*Prototype, self.readUnit32())
+	for i := range protos {
+		protos[i] = self.readProto(parentSource)
+	}
+	return protos
+}
+
+func (self *reader) readLineInfo() []uint32 {
+	lineInfo := make([]uint32, self.readUnit32())
+	for i := range lineInfo {
+		lineInfo[i] = self.readUnit32()
+	}
+	return lineInfo
+}
+
+func (self *reader) readLocVars() []LocVar {
+	LocVars := make([]LocVar, self.readUnit32())
+	for i := range LocVars {
+		LocVars[i] = LocVar{
+			VarName: self.readString(),
+			StartPC: self.readUnit32(),
+			EndPC:   self.readUnit32(),
+		}
+	}
+	return LocVars
+}
+
+func (self *reader) readUpvalueNames() []string {
+	names := make([]string, self.readUnit32())
+	for i := range names {
+		names[i] = self.readString()
+	}
+	return names
+}
+
 func (self *reader) readProto(parentSource string) *Prototype {
 	source := self.readString()
 	if source == "" {
