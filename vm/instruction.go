@@ -41,6 +41,10 @@ func (self Instruction) OpName() string {
 	return opcodes[self.Opcode()].name
 }
 
+func (self Instruction) OpMode() byte {
+	return opcodes[self.Opcode()].opMode
+}
+
 func (self Instruction) BMode() byte {
 	return opcodes[self.Opcode()].argBMode
 }
