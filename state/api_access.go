@@ -1,6 +1,9 @@
 package state
 
-import . "luago/api"
+import (
+	"fmt"
+	. "luago/api"
+)
 
 func (self *luaState) TypeName(tp LuaType) string {
 	switch tp {
@@ -93,4 +96,36 @@ func (self *luaState) ToNumberX(idx int) (float64, bool) {
 	default:
 		return 0, false
 	}
+}
+
+func (self *luaState) ToInteger(idx int) int64 {
+	i, _ := self.ToIntegerX(idx)
+	return i
+}
+
+func (self *luaState) ToIntegerX(idx int) (int64, bool) {
+	val := self.stack.get(idx)
+	i, ok := val.(int64)
+	return i, ok
+}
+
+func (self *luaState) ToStringX(idx int) (string, bool) {
+	val := self.stack.get(idx)
+	switch x := val.(type) {
+	case string:
+		return x, true
+
+	case int64, float64:
+		s := fmt.Sprintf("%w", x)
+		self.stack.set(idx, s)
+		return s, true
+
+	default:
+		return "", false
+	}
+}
+
+func (self *luaState) ToString(idx int) string {
+	s, _ := self.ToStringX(idx)
+	return s
 }
