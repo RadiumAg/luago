@@ -72,18 +72,7 @@ func (self *luaState) IsInteger(idx int) bool {
 
 func (self *luaState) ToBoolean(idx int) bool {
 	val := self.stack.get(idx)
-	return covertToBoolean(val)
-}
-
-func covertToBoolean(val luaValue) bool {
-	switch x := val.(type) {
-	case nil:
-		return false
-	case bool:
-		return x
-	default:
-		return true
-	}
+	return convertToBoolean(val)
 }
 
 func (self *luaState) ToNumberX(idx int) (float64, bool) {

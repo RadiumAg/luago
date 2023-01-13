@@ -3,7 +3,9 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	. "luago/api"
 	binchunk "luago/bingchunk"
+	"luago/state"
 	"luago/vm"
 	"os"
 )
@@ -17,6 +19,10 @@ func main() {
 		proto := binchunk.Undump(data)
 		list(proto)
 	}
+
+	ls := state.New()
+	ls.PushBoolean(true)
+	printStack(ls)
 }
 
 func list(f *binchunk.Prototype) {
@@ -27,6 +33,29 @@ func list(f *binchunk.Prototype) {
 	for _, p := range f.Protos {
 		list(p)
 	}
+}
+
+func printStack(ls LuaState) {
+	top := ls.GetTop()
+	for i := 1; i <= top; i++ {
+		t := ls.Type(i)
+		switch t {
+		case LUA_TBOOLEAN:
+			fmt.Printf("[%t]", ls.ToBoolean(i))
+
+		case LUA_TNUMBER:
+			fmt.Printf("[%t]", ls.ToNumber(i))
+
+		case LUA_TSTRING:
+			fmt.Printf("[%q]", ls.ToString(i))
+
+		default:
+			fmt.Printf("[%s]", ls.TypeName(t))
+
+		}
+	}
+
+	fmt.Println()
 }
 
 func printHeader(f *binchunk.Prototype) {
