@@ -71,3 +71,8 @@ func (self *luaState) SetTop(idx int) {
 		}
 	}
 }
+
+func (self *luaState) Remove(idx int) {
+	self.Rotate(idx, -1)
+	self.Pop(1)
+}

@@ -1,7 +1,7 @@
 package api
 
 const (
-	LUA_TNONE = iota - 1
+	LUA_TNONE = iota - 1 // -1
 	LUA_TNIL
 	LUA_TBOOLEAN
 	LUA_TLIGHTUSERDATA
@@ -10,5 +10,5 @@ const (
 	LUA_TTABLE
 	LUA_TFUNCTION
 	LUA_TUSERDATA
-	LUA_TTHEAD
+	LUA_TTHREAD
 )
