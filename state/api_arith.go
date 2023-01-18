@@ -61,3 +61,24 @@ type operator struct {
 	integerFunc func(int64, int64)
 	floatFunc   func(float64, float64) float64
 }
+
+var operators = []operator{
+	operator{iadd,fadd}
+	operator{isub,fsub}
+	operator{imul,fmul}
+	operator{imod,fmod}
+	operator{nil,pow}
+	operator{nil,div}
+	operator{iidiv,fidiv}
+	operator{band,nil}
+	operator{bor,nil}
+	operator{bxor,nil}
+	operator{bxor,nil}
+	operator{shl,  nil}
+	operator{shr,nil}
+	operator{iunm,funm}
+	operator{bnot,nil}
+}
+
+
+func(self * luaState) Arith(op ArithOp){}
