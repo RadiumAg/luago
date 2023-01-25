@@ -64,5 +64,16 @@ func _lt(a, b luaValue) bool {
 		case float64:
 			return float64(x) < y
 		}
+
+	case float64:
+		switch y := b.(type) {
+		case float64:
+			return x < y
+
+		case int64:
+			return x < float64(y)
+		}
 	}
+
+	panic("comparison error!")
 }
