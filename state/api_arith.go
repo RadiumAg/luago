@@ -3,7 +3,6 @@ package state
 import (
 	"luago/api"
 	"luago/number"
-	. "luago/number"
 	"math"
 )
 
@@ -60,7 +59,7 @@ var (
 )
 
 type operator struct {
-	integerFunc func(int64, int64) int16
+	integerFunc func(int64, int64) int64
 	floatFunc   func(float64, float64) float64
 }
 

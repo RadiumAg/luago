@@ -74,6 +74,31 @@ func _lt(a, b luaValue) bool {
 			return x < float64(y)
 		}
 	}
+	panic("comparison error!")
+}
 
+func _le(a, b luaValue) bool {
+	switch x := a.(type) {
+	case string:
+		if y, ok := b.(string); ok {
+			return x < y
+		}
+
+	case int64:
+		switch y := b.(type) {
+		case int64:
+			return x <= y
+		case float64:
+			return float64(x) <= y
+		}
+
+	case float64:
+		switch y := b.(type) {
+		case float64:
+			return x <= y
+		case int64:
+			return x <= float64(y)
+		}
+	}
 	panic("comparison error!")
 }
