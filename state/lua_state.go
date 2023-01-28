@@ -8,8 +8,10 @@ type luaState struct {
 	pc    int
 }
 
-func New() *luaState {
+func New(stackSize int, proto *binchunk.Prototype) *luaState {
 	return &luaState{
 		stack: newLuaStack(30),
+		proto: proto,
+		pc:    0,
 	}
 }
