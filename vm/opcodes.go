@@ -1,5 +1,7 @@
 package vm
 
+import "luago/api"
+
 const (
 	IABC = iota
 	IABx
@@ -71,15 +73,16 @@ type opcode struct {
 	argCMode byte
 	opMode   byte
 	name     string
+	action   func(i Instruction, vm api.LuaVM)
 }
 
 var opcodes = []opcode{
 	// T  A     B        C      mode     name
-	{0, 1, OpArgR, OpArgN, IABC, "MOVE     "},
-	{0, 1, OpArgK, OpArgN, IABx, "LOADK    "},
-	{0, 1, OpArgN, OpArgN, IABx, "LOADKX  "},
-	{0, 1, OpArgU, OpArgU, IABC, "LOADBOOL"},
-	{0, 1, OpArgU, OpArgN, IABC, "LOADNIL "},
+	{0, 1, OpArgR, OpArgN, IABC, "MOVE     ", move},
+	{0, 1, OpArgK, OpArgN, IABx, "LOADK    ", loadK},
+	{0, 1, OpArgN, OpArgN, IABx, "LOADKX  ", loadKx},
+	{0, 1, OpArgU, OpArgU, IABC, "LOADBOOL", loadBool},
+	{0, 1, OpArgU, OpArgN, IABC, "LOADNIL ", loadNil},
 	{0, 1, OpArgU, OpArgN, IABC, "GETUPVAL"},
 	{0, 1, OpArgU, OpArgK, IABC, "GETTABUP"},
 	{0, 1, OpArgR, OpArgK, IABC, "GETTABLE"},
@@ -88,38 +91,38 @@ var opcodes = []opcode{
 	{0, 0, OpArgK, OpArgK, IABC, "SETTABLE"},
 	{0, 1, OpArgU, OpArgU, IABC, "NEWTABLE"},
 	{0, 1, OpArgR, OpArgK, IABC, "SELF     "},
-	{0, 1, OpArgK, OpArgK, IABC, "ADD      "},
-	{0, 1, OpArgK, OpArgK, IABC, "SUB      "},
-	{0, 1, OpArgK, OpArgK, IABC, "MUL      "},
-	{0, 1, OpArgK, OpArgK, IABC, "MOD      "},
-	{0, 1, OpArgK, OpArgK, IABC, "POW      "},
-	{0, 1, OpArgK, OpArgK, IABC, "DIV      "},
-	{0, 1, OpArgK, OpArgK, IABC, "IDIV     "},
-	{0, 1, OpArgK, OpArgK, IABC, "BAND     "},
-	{0, 1, OpArgK, OpArgK, IABC, "BOR      "},
-	{0, 1, OpArgK, OpArgK, IABC, "BXOR     "},
-	{0, 1, OpArgK, OpArgK, IABC, "SHL      "},
-	{0, 1, OpArgK, OpArgK, IABC, "SHR      "},
-	{0, 1, OpArgR, OpArgN, IABC, "UNM      "},
-	{0, 1, OpArgR, OpArgN, IABC, "BNOT     "},
-	{0, 1, OpArgR, OpArgN, IABC, "NOT      "},
-	{0, 1, OpArgR, OpArgN, IABC, "LEN      "},
-	{0, 1, OpArgR, OpArgR, IABC, "CONCAT  "},
+	{0, 1, OpArgK, OpArgK, IABC, "ADD      ", add},
+	{0, 1, OpArgK, OpArgK, IABC, "SUB      ", sub},
+	{0, 1, OpArgK, OpArgK, IABC, "MUL      ", mul},
+	{0, 1, OpArgK, OpArgK, IABC, "MOD      ", mod},
+	{0, 1, OpArgK, OpArgK, IABC, "POW      ", pow},
+	{0, 1, OpArgK, OpArgK, IABC, "DIV      ", div},
+	{0, 1, OpArgK, OpArgK, IABC, "IDIV     ", idiv},
+	{0, 1, OpArgK, OpArgK, IABC, "BAND     ", band},
+	{0, 1, OpArgK, OpArgK, IABC, "BOR      ", bor},
+	{0, 1, OpArgK, OpArgK, IABC, "BXOR     ", bxor},
+	{0, 1, OpArgK, OpArgK, IABC, "SHL      ", shl},
+	{0, 1, OpArgK, OpArgK, IABC, "SHR      ", shr},
+	{0, 1, OpArgR, OpArgN, IABC, "UNM      ", unm},
+	{0, 1, OpArgR, OpArgN, IABC, "BNOT     ", bnot},
+	{0, 1, OpArgR, OpArgN, IABC, "NOT      ", not},
+	{0, 1, OpArgR, OpArgN, IABC, "LEN      ", len},
+	{0, 1, OpArgR, OpArgR, IABC, "CONCAT  ", concat},
 	{0, 0, OpArgR, OpArgN, IAsBx, "JMP      "},
-	{1, 0, OpArgK, OpArgK, IABC, "EQ       "},
-	{1, 0, OpArgK, OpArgK, IABC, "LT       "},
-	{1, 0, OpArgK, OpArgK, IABC, "LE       "},
-	{1, 0, OpArgN, OpArgU, IABC, "TEST     "},
-	{1, 1, OpArgR, OpArgU, IABC, "TESTSET "},
+	{1, 0, OpArgK, OpArgK, IABC, "EQ       ", eq},
+	{1, 0, OpArgK, OpArgK, IABC, "LT       ", lt},
+	{1, 0, OpArgK, OpArgK, IABC, "LE       ", le},
+	{1, 0, OpArgN, OpArgU, IABC, "TEST     ", test},
+	{1, 1, OpArgR, OpArgU, IABC, "TESTSET ", testSet},
 	{0, 1, OpArgU, OpArgU, IABC, "CALL     "},
 	{0, 1, OpArgU, OpArgU, IABC, "TAILCALL"},
 	{0, 0, OpArgU, OpArgN, IABC, "RETURN  "},
-	{0, 1, OpArgR, OpArgN, IAsBx, "FORLOOP "},
-	{0, 1, OpArgR, OpArgN, IAsBx, "FORPREP "},
+	{0, 1, OpArgR, OpArgN, IAsBx, "FORLOOP ", forLoop},
+	{0, 1, OpArgR, OpArgN, IAsBx, "FORPREP ", forPrep},
 	{0, 0, OpArgN, OpArgU, IABC, "TFORCALL"},
 	{0, 1, OpArgR, OpArgN, IAsBx, "TFORLOOP"},
 	{0, 0, OpArgU, OpArgU, IABC, "SETLIST "},
-	{0, 1, OpArgU, OpArgN, IABx, "CLOSURE "},
+	{0, 1, OpArgU, OpArgN, IABx, "CLOSURE ", close},
 	{0, 1, OpArgU, OpArgN, IABC, "VARARG  "},
 	{0, 0, OpArgU, OpArgU, IAx, "EXTRAARG"},
 }

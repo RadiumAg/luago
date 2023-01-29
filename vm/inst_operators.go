@@ -54,3 +54,80 @@ func concat(i Instruction, vm api.LuaVM) {
 	vm.Concat(n)
 	vm.Replace(a)
 }
+
+func _compare(i Instruction, vm api.LuaVM, op api.CompareOp) {
+	a, b, c := i.ABC()
+
+	vm.GetRk(b)
+	vm.GetRk(c)
+
+	if vm.Compare(-2, -1, op) != (a != 0) {
+		vm.AddPC()
+	}
+	vm.Pop(2)
+}
+
+func eq(i Instruction, vm api.LuaVM) {
+	_compare(i, vm, api.LUA_OPEQ)
+}
+
+func lt(i Instruction, vm api.LuaVM) {
+	_compare(i, vm, api.LUA_OPLT)
+}
+
+func le(i Instruction, vm api.LuaVM) {
+	_compare(i, vm, api.LUA_OPLE)
+}
+
+func not(i Instruction, vm api.LuaVM) {
+	a, b, _ := i.ABC()
+	a += 1
+	b += 1
+	vm.PushBoolean(!vm.ToBoolean(b))
+	vm.Replace(a)
+}
+
+func testSet(i Instruction, vm api.LuaVM) {
+	a, b, c := i.ABC()
+	a += 1
+	b += 1
+	if vm.ToBoolean(b) == (c != 0) {
+		vm.Copy(b, a)
+	} else {
+		vm.AddPC(1)
+	}
+}
+
+func test(i Instruction, vm api.LuaVM) {
+	a, _, c := i.ABC()
+	a += 1
+	if vm.ToBoolean(a) != (c != 0) {
+		vm.AddPC(1)
+	}
+}
+
+func forPrep(i Instruction, vm api.LuaVM) {
+	a, sBx := i.AsBx()
+	a += 1
+
+	vm.PushValue(a)
+	vm.PushValue(a + 2)
+	vm.Arith(api.LUA_OPSUB)
+	vm.Replace(a)
+	vm.AddPC(sBx)
+}
+
+func forLoop(i Instruction, vm api.LuaVM) {
+	a, sBx := i.AsBx()
+	a += 1
+	vm.PushValue(a + 2)
+	vm.PushValue(a)
+	vm.Arith(api.LUA_OPADD)
+	vm.Replace(a)
+
+	isPositiveStep := vm.ToNumber(a+2) >= 0
+	if isPositiveStep && vm.Compare(a, a+1, api.LUA_OPLE) || !isPositiveStep && vm.Compare(a+1, a, api.LUA_OPLE) {
+		vm.AddPC(sBx)
+		vm.Copy(a, a+3)
+	}
+}
