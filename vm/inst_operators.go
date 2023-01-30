@@ -5,8 +5,8 @@ import "luago/api"
 func _binaryArith(i Instruction, vm api.LuaVM, op api.ArithOp) {
 	a, b, c := i.ABC()
 	a += 1
-	vm.GetRk(b)
-	vm.GetRk(c)
+	vm.GetRK(b)
+	vm.GetRK(c)
 	vm.Arith(op)
 	vm.Replace(a)
 }
@@ -58,11 +58,11 @@ func concat(i Instruction, vm api.LuaVM) {
 func _compare(i Instruction, vm api.LuaVM, op api.CompareOp) {
 	a, b, c := i.ABC()
 
-	vm.GetRk(b)
-	vm.GetRk(c)
+	vm.GetRK(b)
+	vm.GetRK(c)
 
 	if vm.Compare(-2, -1, op) != (a != 0) {
-		vm.AddPC()
+		vm.AddPC(1)
 	}
 	vm.Pop(2)
 }
@@ -129,5 +129,14 @@ func forLoop(i Instruction, vm api.LuaVM) {
 	if isPositiveStep && vm.Compare(a, a+1, api.LUA_OPLE) || !isPositiveStep && vm.Compare(a+1, a, api.LUA_OPLE) {
 		vm.AddPC(sBx)
 		vm.Copy(a, a+3)
+	}
+}
+
+func jmp(i Instruction, vm api.LuaVM) {
+	a, sBx := i.AsBx()
+
+	vm.AddPC(sBx)
+	if a != 0 {
+		panic("todo：jmp!")
 	}
 }

@@ -189,5 +189,6 @@ func (self *reader) readProto(parentSource string) *Prototype {
 		IsVararg:        self.readByte(),
 		MaxStackSize:    self.readByte(),
 		Code:            self.readCode(),
+		Constants:       self.readConstants(),
 	}
 }
