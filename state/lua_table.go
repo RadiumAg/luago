@@ -1,0 +1,62 @@
+package state
+
+import "luago/number"
+
+type luaTable struct {
+	arr  []luaValue
+	_map map[luaValue]luaValue
+}
+
+func newLuaTable(nArr, nRec int) *luaTable {
+	t := &luaTable{}
+	if nArr > 0 {
+		t.arr = make([]luaValue, 0, nArr)
+	}
+
+	if nRec > 0 {
+		t._map = make(map[luaValue]luaValue, nRec)
+	}
+
+	return t
+}
+
+func (self *luaTable) get(key luaValue) luaValue {
+	key = _floatToIntger(key)
+	if idx, ok := key.(int64); ok {
+		if idx > 1 && idx <= int64(len(self.arr)) {
+			return self.arr[idx-1]
+		}
+	}
+
+	return self._map[key]
+}
+
+func _floatToIntger(key luaValue) luaValue {
+	if f, ok := key.(float64); ok {
+		if i, ok := number.FloatToInteger(f); ok {
+			return i
+		}
+	}
+
+	return key
+}
+
+func (self *luaTable) put(key, val luaValue) {
+	if idx, ok := key.(int64); ok && idx >= 1 {
+		arrLen := int64(len(self.arr))
+		if idx <= arrLen {
+			self.arr[idx-1] = val
+			if idx == arrLen && val == nil {
+				self._shrinkArray()
+			}
+		}
+
+		if idx == arrLen+1 {
+			delete(self._map, key)
+			if val != nil {
+				self.arr = append(self.arr, val)
+				self.
+			}
+		}
+	}
+}
