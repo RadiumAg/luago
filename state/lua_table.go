@@ -55,8 +55,27 @@ func (self *luaTable) put(key, val luaValue) {
 			delete(self._map, key)
 			if val != nil {
 				self.arr = append(self.arr, val)
-				self.
+				self._expandArray()
 			}
+		}
+	}
+}
+
+func (self *luaTable) _shrinkArray() {
+	for i := len(self.arr) - 1; i >= 0; i-- {
+		if self.arr[i] == nil {
+			self.arr = self.arr[0:i]
+		}
+	}
+}
+
+func (self *luaTable) _expandArray() {
+	for idx := int64(len(self.arr)) + 1; true; idx++ {
+		if val, found := self._map[idx]; found {
+			delete(self._map, idx)
+			self.arr = append(self.arr, val)
+		} else {
+			break
 		}
 	}
 }
