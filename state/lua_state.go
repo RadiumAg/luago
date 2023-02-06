@@ -6,6 +6,9 @@ type luaState struct {
 	stack *luaStack
 	proto *binchunk.Prototype
 	pc    int
+
+	/** get functions (Lua -> stack) **/
+
 }
 
 func New(stackSize int, proto *binchunk.Prototype) *luaState {
