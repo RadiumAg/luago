@@ -7,6 +7,10 @@ func (self *luaState) CreateTable(nArr, nRec int) {
 	self.stack.push(t)
 }
 
+func (self *luaState) NewTable() {
+	self.CreateTable(0, 0)
+}
+
 func (self *luaState) GetTable(idx int) LuaType {
 	t := self.stack.get(idx)
 	k := self.stack.pop()
