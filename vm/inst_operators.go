@@ -38,6 +38,8 @@ func bnot(i Instruction, vm api.LuaVM) { _unaryArith(i, vm, api.LUA_OPBNOT) }  /
 func _len(i Instruction, vm api.LuaVM) {
 	a, b, _ := i.ABC()
 	a += 1
+	b += 1
+
 	vm.Len(b)
 	vm.Replace(a)
 }
@@ -45,6 +47,9 @@ func _len(i Instruction, vm api.LuaVM) {
 func concat(i Instruction, vm api.LuaVM) {
 	a, b, c := i.ABC()
 	a += 1
+	b += 1
+	c += 1
+
 	n := c - b + 1
 	vm.CheckStack(n)
 	for i := b; i <= c; i++ {

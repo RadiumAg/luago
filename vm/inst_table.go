@@ -14,6 +14,7 @@ func newTable(i Instruction, vm LuaVM) {
 func getTable(i Instruction, vm LuaVM) {
 	a, b, c := i.ABC()
 	a += 1
+	b += 1
 	vm.GetRK(c)
 	vm.GetTable(b)
 	vm.Replace(a)

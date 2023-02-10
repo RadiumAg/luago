@@ -1,7 +1,6 @@
 package vm
 
 import (
-	"fmt"
 	"luago/api"
 )
 
@@ -59,7 +58,6 @@ func (self Instruction) CMode() byte {
 }
 
 func (self Instruction) Execute(vm api.LuaVM) {
-	fmt.Printf("%d", opcodes[self.Opcode()])
 	action := opcodes[self.Opcode()].action
 	if action != nil {
 		action(self, vm)
