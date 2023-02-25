@@ -25,6 +25,7 @@ func (self *luaState) Concat(n int) {
 				self.stack.push(s1 + s2)
 				continue
 			}
+
 			panic("concatenation error!")
 		}
 	}
