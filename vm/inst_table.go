@@ -23,6 +23,7 @@ func getTable(i Instruction, vm LuaVM) {
 func setTable(i Instruction, vm LuaVM) {
 	a, b, c := i.ABC()
 	a += 1
+
 	vm.GetRK(b)
 	vm.GetRK(c)
 	vm.SetTable(a)

@@ -31,7 +31,7 @@ func luaMain(proto *binchunk.Prototype) {
 		inst := vm.Instruction(ls.Fetch())
 		if inst.Opcode() != vm.OP_RETURN {
 			inst.Execute(ls)
-			fmt.Printf("[%02d] %s", pc+1, inst.OpName())
+			fmt.Printf("[%02d] %s ", pc+1, inst.OpName())
 			printStack(ls)
 		} else {
 			break
@@ -120,8 +120,8 @@ func constantToString(k interface{}) string {
 }
 
 func upvalName(f *binchunk.Prototype, idx int) string {
-	if len(f.UpValueNames) > 0 {
-		return f.UpValueNames[idx]
+	if len(f.UpvalueNames) > 0 {
+		return f.UpvalueNames[idx]
 	}
 	return "-"
 }

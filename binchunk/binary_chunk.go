@@ -33,7 +33,7 @@ type Prototype struct {
 	Protos          []*Prototype
 	LineInfo        []uint32
 	LocVars         []LocVar
-	UpValueNames    []string
+	UpvalueNames    []string
 }
 
 const (

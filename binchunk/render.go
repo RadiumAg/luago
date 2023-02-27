@@ -175,6 +175,12 @@ func (self *reader) readUpvalueNames() []string {
 	return names
 }
 
+func (self *reader) readUint32() uint32 {
+	i := binary.LittleEndian.Uint32(self.data)
+	self.data = self.data[4:]
+	return i
+}
+
 func (self *reader) readProto(parentSource string) *Prototype {
 	source := self.readString()
 	if source == "" {
@@ -183,12 +189,17 @@ func (self *reader) readProto(parentSource string) *Prototype {
 
 	return &Prototype{
 		Source:          source,
-		LineDefined:     self.readUnit32(),
-		LastLineDefined: self.readUnit32(),
+		LineDefined:     self.readUint32(),
+		LastLineDefined: self.readUint32(),
 		NumParams:       self.readByte(),
 		IsVararg:        self.readByte(),
 		MaxStackSize:    self.readByte(),
 		Code:            self.readCode(),
 		Constants:       self.readConstants(),
+		Upvalues:        self.readUpvalues(),
+		Protos:          self.readProtos(source),
+		LineInfo:        self.readLineInfo(),
+		LocVars:         self.readLocVars(),
+		UpvalueNames:    self.readUpvalueNames(),
 	}
 }

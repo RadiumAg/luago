@@ -23,6 +23,7 @@ func (self *luaState) getTable(t, k luaValue) LuaType {
 		self.stack.push(v)
 		return typeOf(v)
 	}
+
 	panic("not a table!")
 }
 
