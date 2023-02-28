@@ -1,9 +1,7 @@
 package state
 
-import (
-	"fmt"
-	. "luago/api"
-)
+import "fmt"
+import . "luago/api"
 
 // [-0, +0, –]
 // http://www.lua.org/manual/5.3/manual.html#lua_typename
@@ -122,7 +120,7 @@ func (self *luaState) ToInteger(idx int) int64 {
 // http://www.lua.org/manual/5.3/manual.html#lua_tointegerx
 func (self *luaState) ToIntegerX(idx int) (int64, bool) {
 	val := self.stack.get(idx)
-	return covertToInteger(val)
+	return convertToInteger(val)
 }
 
 // [-0, +0, –]
@@ -136,7 +134,7 @@ func (self *luaState) ToNumber(idx int) float64 {
 // http://www.lua.org/manual/5.3/manual.html#lua_tonumberx
 func (self *luaState) ToNumberX(idx int) (float64, bool) {
 	val := self.stack.get(idx)
-	return covertToFloat(val)
+	return convertToFloat(val)
 }
 
 // [-0, +0, m]

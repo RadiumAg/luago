@@ -21,7 +21,7 @@ func (self *reader) readBytes(n uint) []byte {
 	return bytes
 }
 
-func (self *reader) readUnit32() uint32 {
+func (self *reader) readUint32() uint32 {
 	i := binary.LittleEndian.Uint32(self.data)
 	self.data = self.data[4:]
 	return i
@@ -47,10 +47,10 @@ func (self *reader) readString() string {
 		return ""
 	}
 	if size == 0xFF {
-		size = uint(self.readUint64())
+		size = uint(self.readUint64()) // size_t
 	}
 	bytes := self.readBytes(size - 1)
-	return string(bytes)
+	return string(bytes) // todo
 }
 
 func (self *reader) checkHeader() {
@@ -89,104 +89,11 @@ func (self *reader) checkHeader() {
 	}
 }
 
-// 读组指令表
-func (self *reader) readCode() []uint32 {
-	code := make([]uint32, self.readUnit32())
-	for i := range code {
-		code[i] = self.readUnit32()
-	}
-	return code
-}
-
-// 从字节流里读取常量表
-func (self *reader) readConstants() []interface{} {
-	constans := make([]interface{}, self.readUnit32())
-
-	for i := range constans {
-		constans[i] = self.readConstant()
-	}
-	return constans
-}
-
-func (self *reader) readConstant() interface{} {
-	switch self.readByte() {
-	case TAG_NIL:
-		return nil
-	case TAG_BOOLEAN:
-		return self.readByte() != 0
-	case TAG_INTEGER:
-		return self.readLuaInteger()
-	case TAG_NUMBER:
-		return self.readLuaNumber()
-	case TAG_SHORT_STR:
-		return self.readString()
-	case TAG_LONG_STR:
-		return self.readString()
-
-	default:
-		panic("corrupted!")
-	}
-}
-
-func (self *reader) readUpvalues() []Upvalue {
-	upvalues := make([]Upvalue, self.readUnit32())
-	for i := range upvalues {
-		upvalues[i] = Upvalue{
-			Instack: self.readByte(),
-			Idx:     self.readByte(),
-		}
-	}
-	return upvalues
-}
-
-func (self *reader) readProtos(parentSource string) []*Prototype {
-	protos := make([]*Prototype, self.readUnit32())
-	for i := range protos {
-		protos[i] = self.readProto(parentSource)
-	}
-	return protos
-}
-
-func (self *reader) readLineInfo() []uint32 {
-	lineInfo := make([]uint32, self.readUnit32())
-	for i := range lineInfo {
-		lineInfo[i] = self.readUnit32()
-	}
-	return lineInfo
-}
-
-func (self *reader) readLocVars() []LocVar {
-	LocVars := make([]LocVar, self.readUnit32())
-	for i := range LocVars {
-		LocVars[i] = LocVar{
-			VarName: self.readString(),
-			StartPC: self.readUnit32(),
-			EndPC:   self.readUnit32(),
-		}
-	}
-	return LocVars
-}
-
-func (self *reader) readUpvalueNames() []string {
-	names := make([]string, self.readUnit32())
-	for i := range names {
-		names[i] = self.readString()
-	}
-	return names
-}
-
-func (self *reader) readUint32() uint32 {
-	i := binary.LittleEndian.Uint32(self.data)
-	self.data = self.data[4:]
-	return i
-}
-
 func (self *reader) readProto(parentSource string) *Prototype {
 	source := self.readString()
 	if source == "" {
 		source = parentSource
 	}
-
 	return &Prototype{
 		Source:          source,
 		LineDefined:     self.readUint32(),
@@ -202,4 +109,84 @@ func (self *reader) readProto(parentSource string) *Prototype {
 		LocVars:         self.readLocVars(),
 		UpvalueNames:    self.readUpvalueNames(),
 	}
+}
+
+func (self *reader) readCode() []uint32 {
+	code := make([]uint32, self.readUint32())
+	for i := range code {
+		code[i] = self.readUint32()
+	}
+	return code
+}
+
+func (self *reader) readConstants() []interface{} {
+	constants := make([]interface{}, self.readUint32())
+	for i := range constants {
+		constants[i] = self.readConstant()
+	}
+	return constants
+}
+
+func (self *reader) readConstant() interface{} {
+	switch self.readByte() {
+	case TAG_NIL:
+		return nil
+	case TAG_BOOLEAN:
+		return self.readByte() != 0
+	case TAG_INTEGER:
+		return self.readLuaInteger()
+	case TAG_NUMBER:
+		return self.readLuaNumber()
+	case TAG_SHORT_STR, TAG_LONG_STR:
+		return self.readString()
+	default:
+		panic("corrupted!") // todo
+	}
+}
+
+func (self *reader) readUpvalues() []Upvalue {
+	upvalues := make([]Upvalue, self.readUint32())
+	for i := range upvalues {
+		upvalues[i] = Upvalue{
+			Instack: self.readByte(),
+			Idx:     self.readByte(),
+		}
+	}
+	return upvalues
+}
+
+func (self *reader) readProtos(parentSource string) []*Prototype {
+	protos := make([]*Prototype, self.readUint32())
+	for i := range protos {
+		protos[i] = self.readProto(parentSource)
+	}
+	return protos
+}
+
+func (self *reader) readLineInfo() []uint32 {
+	lineInfo := make([]uint32, self.readUint32())
+	for i := range lineInfo {
+		lineInfo[i] = self.readUint32()
+	}
+	return lineInfo
+}
+
+func (self *reader) readLocVars() []LocVar {
+	locVars := make([]LocVar, self.readUint32())
+	for i := range locVars {
+		locVars[i] = LocVar{
+			VarName: self.readString(),
+			StartPC: self.readUint32(),
+			EndPC:   self.readUint32(),
+		}
+	}
+	return locVars
+}
+
+func (self *reader) readUpvalueNames() []string {
+	names := make([]string, self.readUint32())
+	for i := range names {
+		names[i] = self.readString()
+	}
+	return names
 }

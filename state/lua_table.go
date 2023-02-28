@@ -15,12 +15,14 @@ func newLuaTable(nArr, nRec int) *luaTable {
 	if nArr > 0 {
 		t.arr = make([]luaValue, 0, nArr)
 	}
-
 	if nRec > 0 {
 		t._map = make(map[luaValue]luaValue, nRec)
 	}
-
 	return t
+}
+
+func (self *luaTable) len() int {
+	return len(self.arr)
 }
 
 func (self *luaTable) get(key luaValue) luaValue {
@@ -30,7 +32,6 @@ func (self *luaTable) get(key luaValue) luaValue {
 			return self.arr[idx-1]
 		}
 	}
-
 	return self._map[key]
 }
 
@@ -40,7 +41,6 @@ func _floatToInteger(key luaValue) luaValue {
 			return i
 		}
 	}
-
 	return key
 }
 
@@ -85,6 +85,8 @@ func (self *luaTable) _shrinkArray() {
 	for i := len(self.arr) - 1; i >= 0; i-- {
 		if self.arr[i] == nil {
 			self.arr = self.arr[0:i]
+		} else {
+			break
 		}
 	}
 }
@@ -98,8 +100,4 @@ func (self *luaTable) _expandArray() {
 			break
 		}
 	}
-}
-
-func (self *luaTable) len() int {
-	return len(self.arr)
 }

@@ -2,8 +2,8 @@ package vm
 
 /*
 ** converts an integer to a "floating point byte", represented as
-** (eeeeexxx), where the real value is (1xxx) * 2^(eeeee -1) if
-** eeeee ! = 0 and (xxx) otherwise.
+** (eeeeexxx), where the real value is (1xxx) * 2^(eeeee - 1) if
+** eeeee != 0 and (xxx) otherwise.
  */
 func Int2fb(x int) int {
 	e := 0 /* exponent */

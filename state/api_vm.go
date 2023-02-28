@@ -20,9 +20,9 @@ func (self *luaState) GetConst(idx int) {
 }
 
 func (self *luaState) GetRK(rk int) {
-	if rk > 0xFF {
-		self.GetConst(rk & 0xff)
-	} else {
+	if rk > 0xFF { // constant
+		self.GetConst(rk & 0xFF)
+	} else { // register
 		self.PushValue(rk + 1)
 	}
 }

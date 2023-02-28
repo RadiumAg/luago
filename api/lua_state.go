@@ -5,10 +5,6 @@ type ArithOp = int
 type CompareOp = int
 
 type LuaState interface {
-	Arith(op ArithOp)
-	Compare(idx1, idx2 int, op CompareOp) bool
-	Len(idx int)
-	Concat(n int)
 	/* basic stack manipulation */
 	GetTop() int
 	AbsIndex(idx int) int
@@ -47,7 +43,10 @@ type LuaState interface {
 	PushInteger(n int64)
 	PushNumber(n float64)
 	PushString(s string)
-	/* get functions (Lua -< stack) */
+	/* Comparison and arithmetic functions */
+	Arith(op ArithOp)
+	Compare(idx1, idx2 int, op CompareOp) bool
+	/* get functions (Lua -> stack) */
 	NewTable()
 	CreateTable(nArr, nRec int)
 	GetTable(idx int) LuaType
@@ -56,5 +55,8 @@ type LuaState interface {
 	/* set functions (stack -> Lua) */
 	SetTable(idx int)
 	SetField(idx int, k string)
-	SetI(idx int, n int64)
+	SetI(idx int, i int64)
+	/* miscellaneous functions */
+	Len(idx int)
+	Concat(n int)
 }
