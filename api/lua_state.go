@@ -59,4 +59,7 @@ type LuaState interface {
 	/* miscellaneous functions */
 	Len(idx int)
 	Concat(n int)
+
+	Load(chunk []byte, chunkName, mode string) int
+	Call(nArgs, nResults int)
 }

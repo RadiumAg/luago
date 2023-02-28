@@ -1,7 +1,9 @@
 package state
 
-import . "luago/api"
-import "luago/number"
+import (
+	. "luago/api"
+	"luago/number"
+)
 
 type luaValue interface{}
 
@@ -17,6 +19,8 @@ func typeOf(val luaValue) LuaType {
 		return LUA_TSTRING
 	case *luaTable:
 		return LUA_TTABLE
+	case *closure:
+		return LUA_TFUNCTION
 	default:
 		panic("todo!")
 	}
